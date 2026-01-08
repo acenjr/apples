@@ -1,13 +1,16 @@
 import { useMediaQuery } from "react-responsive";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const Showcase = () => {
   const isTablet = useMediaQuery({ query: "(max-width: 1024px)" });
 
   useGSAP(() => {
+    let timeline = null;
+
     if (!isTablet) {
-      const timeline = gsap.timeline({
+      timeline = gsap.timeline({
         scrollTrigger: {
           trigger: "#showcase",
           start: "top top",
@@ -23,6 +26,17 @@ const Showcase = () => {
         })
         .to(".content", { opacity: 1, y: 0, ease: "power1.in" });
     }
+
+    // Cleanup function: kill ScrollTrigger when isTablet becomes true or on unmount
+    return () => {
+      if (timeline) {
+        const scrollTrigger = timeline.scrollTrigger;
+        if (scrollTrigger) {
+          scrollTrigger.kill();
+        }
+        timeline.kill();
+      }
+    };
   }, [isTablet]);
 
   return (
@@ -49,8 +63,8 @@ const Showcase = () => {
               </p>
               <p>
                 It drives Apple Intelligence on iPad Pro, so you can write,
-                create, and accomplish more with ease. All in a design that’s
-                unbelievably thin, light, and powerful.
+                create, and accomplish more with ease. All in a design
+                that&apos;s unbelievably thin, light, and powerful.
               </p>
               <p>
                 A brand-new display engine delivers breathtaking precision,
